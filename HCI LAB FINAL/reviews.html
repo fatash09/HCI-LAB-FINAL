@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: grey; /* Gradient background */
+            color: #333;
+        }
+
+
+        .navbar-brand {
+            color: darkred;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .container {
+            margin-top: 20px;
+            background-color: white; /* White background for content */
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+        }
+
+        .review-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: lightgrey; /* Light blue background for review cards */
+            transition: transform 0.3s;
+        }
+
+        .review-card:hover {
+            transform: scale(1.02);
+        }
+
+        .review-card h4 {
+            color: #007bff;
+        }
+
+        .review-card p {
+            color: #555;
+        }
+
+        .review-card small {
+            color: #777;
+        }
+
+        .review-form {
+            margin-top: 30px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: lightgrey; /* Light blue background for review form */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+    </style>
+    <title>Customer Reviews</title>
+</head>
+<body>
+    <div class="container">
+        <a class="navbar-brand" href="#">Customer Reviews</a>
+    </div>
+
+    <div class="container">
+        <!-- Review Cards -->
+        <div class="row">
+            <!-- Existing review cards go here -->
+        </div>
+
+        <!-- Review Form -->
+        <div class="row review-form">
+            <div class="col-md-6 offset-md-3">
+                <h3 class="mb-3">Write a Review</h3>
+                <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
+                    <div class="form-group">
+                        <label for="name">Your Name</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="review">Your Review</label>
+                        <textarea class="form-control" id="review" name="review" rows="3" placeholder="Write your review" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="rating">Rating</label>
+                        <select class="form-control" id="rating" name="rating" required>
+                            <option value="5">5 stars</option>
+                            <option value="4">4 stars</option>
+                            <option value="3">3 stars</option>
+                            <option value="2">2 stars</option>
+                            <option value="1">1 star</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <?php
+    // Check if form is submitted
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // Database connection parameters
+        $servername = "your_database_server";
+        $username = "your_database_username";
+        $password = "your_database_password";
+        $dbname = "customer_reviews";
+
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
+        // Get form data
+        $name = $_POST['name'];
+        $review = $_POST['review'];
+        $rating = $_POST['rating'];
+
+        // Insert into the database
+        $sql = "INSERT INTO reviews (name, review, rating) VALUES ('$name', '$review', $rating)";
+
+        if ($conn->query($sql) === TRUE) {
+            echo "<p>Review submitted successfully!</p>";
+        } else {
+            echo "<p>Error: " . $sql . "<br>" . $conn->error . "</p>";
+        }
+
+        // Close the database connection
+        $conn->close();
+    }
+    ?>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
