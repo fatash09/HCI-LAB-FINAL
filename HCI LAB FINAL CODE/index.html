@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href="http://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        let shoppingCart = [];
+        let totalBill = 0;
+
+        function updateBill(price, itemName, quantity) {
+            let existingItem = shoppingCart.find(item => item.name === itemName);
+
+            if (existingItem) {
+                existingItem.quantity += quantity;
+                totalBill += price * quantity;
+            } else {
+                totalBill += price * quantity;
+                shoppingCart.push({ name: itemName, price: price, quantity: quantity });
+            }
+        }
+
+        function removeFromCart(index, quantityToRemove) {
+            let removedItem = shoppingCart[index];
+
+            if (quantityToRemove >= removedItem.quantity) {
+                // Remove the entire item if the quantity to remove is greater or equal to the item's quantity
+                totalBill -= removedItem.price * removedItem.quantity;
+                shoppingCart.splice(index, 1);
+            } else {
+                // Update the quantity and total if the quantity to remove is less than the item's quantity
+                removedItem.quantity -= quantityToRemove;
+                totalBill -= removedItem.price * quantityToRemove;
+            }
+        }
+
+        function clearAll() {
+            shoppingCart = [];
+            totalBill = 0;
+        }
+        document.getElementById('clear-all-btn').addEventListener('click', function () {
+                let confirmation = confirm("Are you sure you want to clear all items?");
+                if (confirmation) {
+                    clearAll();
+                    showFinalBill();
+                }
+            });
+
+
+        function buyNow(price, itemName) {
+            let quantity = prompt("Enter quantity for " + itemName + ":");
+            if (quantity && !isNaN(quantity) && quantity > 0) {
+                quantity = parseInt(quantity);
+                updateBill(price, itemName, quantity);
+                alert("Item added to the cart: " + itemName + " (Quantity: " + quantity + "). Total Bill: Rs" + totalBill.toFixed(2));
+            } else {
+                alert("Invalid quantity. Please enter a valid number greater than 0.");
+            }
+        }
+
+        function showFinalBill() {
+            let finalBillSection = document.getElementById('final-bill-section');
+            let finalBillList = document.getElementById('final-bill-list');
+            let totalBillAmount = document.getElementById('final-bill-amount');
+
+            finalBillList.innerHTML = "";
+
+            shoppingCart.forEach(function (item, index) {
+                let listItem = document.createElement("li");
+                listItem.innerHTML = `${item.name} (Quantity: ${item.quantity}) - Rs${(item.price * item.quantity).toFixed(2)}
+                                      <button class="remove-btn" data-index="${index}">Remove</button>`;
+                finalBillList.appendChild(listItem);
+            });
+
+            totalBillAmount.textContent = totalBill.toFixed(2);
+            finalBillSection.style.display = 'block';
+
+            // Attach event listeners to Remove buttons in the final bill
+            document.querySelectorAll('.remove-btn').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    let index = button.getAttribute('data-index');
+                    let quantityToRemove = prompt("Enter quantity to remove for " + shoppingCart[index].name + ":");
+                    if (quantityToRemove && !isNaN(quantityToRemove) && quantityToRemove > 0) {
+                        quantityToRemove = parseInt(quantityToRemove);
+                        removeFromCart(index, quantityToRemove);
+                        showFinalBill();
+                    } else {
+                        alert("Invalid quantity. Please enter a valid number greater than 0.");
+                    }
+                });
+            });
+        }
+
+            function buyNow(price, itemName) {
+                let quantity = prompt("Enter quantity for " + itemName + ":");
+                if (quantity && !isNaN(quantity) && quantity > 0) {
+                    quantity = parseInt(quantity);
+                    updateBill(price, itemName, quantity);
+                    alert("Item added to the cart: " + itemName + " (Quantity: " + quantity + "). Total Bill: Rs" + totalBill.toFixed(2));
+                } else {
+                    alert("Invalid quantity. Please enter a valid number greater than 0.");
+                }
+            }
+            function showFinalBill() {
+    // Display final bill on the same page
+    let finalBillSection = document.getElementById('final-bill-section');
+    let finalBillList = document.getElementById('final-bill-list');
+    let totalBillAmount = document.getElementById('final-bill-amount');
+
+    // Clear previous content
+    finalBillList.innerHTML = "";
+
+    // Populate and display the final bill
+    shoppingCart.forEach(function (item, index) {
+        let listItem = document.createElement("li");
+        listItem.textContent = `${item.name} (Quantity: ${item.quantity}) - Rs${(item.price * item.quantity).toFixed(2)}`;
+        finalBillList.appendChild(listItem);
+    });
+
+    // Display the total bill amount
+    totalBillAmount.textContent = totalBill.toFixed(2);
+
+    // Show the final bill section
+    finalBillSection.style.display = 'block';
+}
+
+function updateBill(price, itemName, quantity) {
+    // Check if the item is already in the shopping cart
+    let existingItem = shoppingCart.find(item => item.name === itemName);
+
+    if (existingItem) {
+        // Update quantity and total if the item is already in the cart
+        existingItem.quantity += quantity;
+        totalBill += price * quantity;
+    } else {
+        // Add the item to the shopping cart if it's not already present
+        totalBill += price * quantity;
+        shoppingCart.push({ name: itemName, price: price, quantity: quantity });
+    }
+}
+
+            // Attach event listeners to Buy Now buttons
+            document.querySelectorAll('.buy-now-btn').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    let price = parseFloat(button.getAttribute('data-price'));
+                    let itemName = button.getAttribute('data-item-name');
+                    buyNow(price, itemName);
+                });
+            });
+
+            // Attach event listener to Show Final Bill button
+            document.getElementById('show-final-bill-btn').addEventListener('click', function () {
+                showFinalBill();
+            });
+
+            // Attach event listener to Remove buttons
+            document.getElementById('shopping-cart-list').addEventListener('click', function (event) {
+                if (event.target.classList.contains('remove-btn')) {
+                    let index = event.target.getAttribute('data-index');
+                    removeFromCart(index);
+                    showShoppingCart();
+                }
+            });
+
+            // Function to display the items in the shopping cart
+            function showShoppingCart() {
+                let shoppingCartList = document.getElementById("shopping-cart-list");
+                // Clear previous content
+                shoppingCartList.innerHTML = "";
+
+                // Display items in the shopping cart
+                shoppingCart.forEach(function (item, index) {
+                    let listItem = document.createElement("li");
+                    listItem.innerHTML = `${item.name} (Quantity: ${item.quantity}) - Rs${(item.price * item.quantity).toFixed(2)} 
+                                          <button class="remove-btn" data-index="${index}">Remove</button>`;
+                    shoppingCartList.appendChild(listItem);
+                });
+            }
+
+        });
+    </script>
+</head>
+<body>
+    <header class="header">
+        <a href="#" class="Logo">HHF<span>FOODS</span></a>
+        <nav class="navbar">
+            <a href="#">Home</a>
+            <a href="#">Dishes</a>
+            <a href="about.html" target="_blank">About</a>
+            <a href="reviews.html" target="_blank">Review </a>
+        </nav>
+        <div class="activity-section">
+            <i class='bx bx-search'></i>
+            <i class='bx bx-heart'></i>
+            <i class='bx bx-cart'></i>
+        </div>
+        <button class="btn" onclick="window.location.href='login.html'">Login</button>
+
+    </header>
+    <section class="home-section">
+        <div class="text-content">
+            <h5>Most Ordered in Rainy Season</h5>
+            <h2>Jumbo Burger</h2>
+            <p> Burgers are one of the most convenient and easiest foods to eat on the fly when we're in a hurry</p>
+            <button class="btn">Order Now</button>
+            <button class="btn btn-explore">Explore More</button>
+        </div>
+        <div class="image-section">
+            <img src="https://nancyjosburgers.com/wp-content/uploads/2023/02/Nancys-Burger-Cutout-e1676861426250.png"
+                alt="">
+            <div class="shadow"></div>
+        </div>
+    </section>
+    <section class="Dishe-section">
+        <h2 class="heading">Our <span>Dishes</span></h2>
+        <div class="dishGallery">
+            <div class="food-image">
+
+                <img src="https://i.ibb.co/Qk6NfPS/vegan-Cobb-Salad-Recipe-scaled-removebg-preview.png" width="100"
+                    height="200" alt="">
+                <div class="inner-text">
+                    <h2>chicken salad</h2>
+                    <p>A salad is a dish consisting of mixed ingredients, frequently vegetables.</p>
+                </div>
+                <div class="price-section">
+                    <span>Rs250.00</span>
+                    <button class="buy-now-btn" data-price="250.00" data-item-name="Chicken Salad"> Buy Now</button>
+                </div>
+            </div>
+            <div class="food-image">
+
+                <img src="https://i.ibb.co/Qk6NfPS/vegan-Cobb-Salad-Recipe-scaled-removebg-preview.png" width="100"
+                    height="200" alt="">
+                <div class="inner-text">
+                    <h2>Cobb Salad</h2>
+                    <p>A salad is a dish consisting of mixed ingredients, frequently vegetables.</p>
+                </div>
+                <div class="price-section">
+                    <span>Rs380.00</span>
+                    <button class="buy-now-btn" data-price="380.00" data-item-name="Cobb Salad"> Buy Now</button>
+                </div>
+            </div>
+            <div class="food-image">
+
+                <img src="https://i.ibb.co/Qk6NfPS/vegan-Cobb-Salad-Recipe-scaled-removebg-preview.png" width="100"
+                    height="200" alt="">
+                <div class="inner-text">
+                    <h2>Greek Salad</h2>
+                    <p>A salad is a dish consisting of mixed ingredients, frequently vegetables.</p>
+                </div>
+                <div class="price-section">
+                    <span>Rs400.00</span>
+                    <button class="buy-now-btn" data-price="400.00" data-item-name="Greek Salad"> Buy Now</button>
+                </div>
+            </div>
+            <div class="food-image">
+
+                <img src="https://i.ibb.co/Qk6NfPS/vegan-Cobb-Salad-Recipe-scaled-removebg-preview.png" width="100"
+                    height="200" alt="">
+                <div class="inner-text">
+                    <h2>Spinach Salad</h2>
+                    <p>A salad is a dish consisting of mixed ingredients, frequently vegetables.</p>
+                </div>
+                <div class="price-section">
+                    <span>Rs420.00</span>
+                    <button class="buy-now-btn" data-price="420.00" data-item-name="Spinach Salad"> Buy Now</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section>
+        <div class="dishGallery">
+            <div class="food-image">
+
+                <img src="https://i.ibb.co/HTpZZ5Y/images-2-removebg-preview-1.png" height="150" alt="">
+                <div class="inner-text">
+                    <h2>Chicken Burger</h2>
+                    <p>Burgers are one of the most convenient and easiest foods to eat on the fly.</p>
+                </div>
+                <div class="price-section">
+                    <span>Rs460.00</span>
+                    <button class="buy-now-btn" data-price="460.00" data-item-name="Chicken Burger"> Buy Now</button>
+                </div>
+            </div>
+            <div class="food-image">
+
+                <img src="https://i.ibb.co/HzZmzF1/images-3-removebg-preview-1.png" height="150" alt="">
+                <div class="inner-text">
+                    <h2>Jumbo Burger</h2>
+                    <p>Burgers are one of the most convenient and easiest foods to eat on the fly.</p>
+                </div>
+                <div class="price-section">
+                    <span>Rs590.00</span>
+                    <button class="buy-now-btn" data-price="590.00" data-item-name="Jumbo Burger"> Buy Now</button>
+                </div>
+            </div>
+            <div class="food-image">
+
+                <img src="https://i.ibb.co/4WBwpzj/toppng-com-chicken-burger-non-veg-burger-442x305-1-removebg-preview.png"
+                    height="150" alt="">
+                <div class="inner-text">
+                    <h2>Crispy Zinger</h2>
+                    <p>Burgers are one of the most convenient and easiest foods to eat on the fly.</p>
+                </div>
+                <div class="price-section">
+                    <span>Rs600.00</span>
+                    <button class="buy-now-btn" data-price="600.00" data-item-name="Crispy Zinger"> Buy Now</button>
+                </div>
+            </div>
+            <div class="food-image">
+
+                <img src="https://i.ibb.co/7z1mVys/png-clipart-hamburger-meal-zinger-tower-kfc-food-kentucky-fried-chicken-thumbnail-removebg-preview.png"
+                    height="200" alt="">
+                <div class="inner-text">
+                    <h2>Zinger Burger</h2>
+                    <p>Burgers are one of the most convenient and easiest foods to eat on the fly.</p>
+                </div>
+                <div class="price-section">
+                    <span>Rs400.00</span>
+                    <button class="buy-now-btn" data-price="400.00" data-item-name="Zinger Burger"> Buy Now</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section>
+        <div class="dishGallery">
+            <div class="food-image">
+
+                <img src="https://i.ibb.co/mBqt2N2/pizzeria-template-header-pizza-img-removebg-preview.png" height="200" alt="">
+                <div class="inner-text">
+                    <h2>chicken Pizza</h2>
+                    <p>Pizza is an Italian food that was created in Italy It is made with different toppings.</p>
+                </div>
+                <div class="price-section">
+                    <span>Rs1500.00</span>
+                    <button class="buy-now-btn" data-price="1500.00" data-item-name="chicken Pizza"> Buy Now</button>
+                </div>
+            </div>
+            <div class="food-image">
+
+                <img src="https://i.ibb.co/mBqt2N2/pizzeria-template-header-pizza-img-removebg-preview.png" height="200" alt="">
+                <div class="inner-text">
+                    <h2>Veggie Pizza</h2>
+                    <p>Pizza is an Italian food that was created in Italy (The Naples area). It is made with different toppings.</p>
+                </div>
+                <div class="price-section">
+                    <span>Rs1400.00</span>
+                    <button class="buy-now-btn" data-price="1400.00" data-item-name="Veggie Pizza"> Buy Now</button>
+                </div>
+            </div>
+            <div class="food-image">
+
+                <img src="https://i.ibb.co/mBqt2N2/pizzeria-template-header-pizza-img-removebg-preview.png" height="200" alt="">
+                <div class="inner-text">
+                    <h2>Meat Pizza</h2>
+                    <p>Pizza is an Italian food that was created in Italy (The Naples area). It is made with different toppings.</p>
+                </div>
+                <div class="price-section">
+                    <span>Rs1600.00</span>
+                    <button class="buy-now-btn" data-price="1600.00" data-item-name="Meat Pizza"> Buy Now</button>
+                </div>
+            </div>
+            <div class="food-image">
+
+                <img src="https://i.ibb.co/mBqt2N2/pizzeria-template-header-pizza-img-removebg-preview.png" height="200" alt="">
+                <div class="inner-text">
+                    <h2>Buffalo Pizza</h2>
+                    <p>Pizza is an Italian food that was created in Italy (The Naples area). It is made with different toppings.</p>
+                </div>
+                <div class="price-section">
+                    <span>Rs2000.00</span>
+                    <button class="buy-now-btn" data-price="2000.00" data-item-name="Buffalo Pizza"> Buy Now</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="shopping-cart-section"><button class="btnn" id="show-final-bill-btn">Show Final Bill</button>
+
+        <!-- Shopping Cart Section -->
+        <section id="shopping-cart-section" style="display: none;">
+            <h2>Shopping Cart</h2>
+            <ul id="shopping-cart-list"></ul>
+        </section>
+    
+        <!-- Final Bill Section -->
+        <section id="final-bill-section" style="display: none;">
+            <h2 id="">Your Final Bill</h2>
+            <ul id="final-bill-list"></ul><br>
+            
+            <p id="total-bill">Total: Rs<span id="final-bill-amount">0.00</span></p>
+            <button class="btnn" id="clear-all-btn">Clear All</button>
+        </section></section>
+</body>
+</html>
